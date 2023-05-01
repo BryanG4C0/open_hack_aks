@@ -1,0 +1,5 @@
+# Inicia una sesión interactiva en el contenedor Docker
+docker exec -it <nombre_contenedor> bash
+
+# Ejecuta SQL Server dentro del contenedor
+/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P '<tu_contraseña_SA>' -d master -i setup-db.sql

@@ -1,0 +1,29 @@
+1. Generar imagenes a partir de los docker file
+2. Logear en el AZ CLI az-login
+3. Loguear en el Azure container resgister 
+   az acr login --name <nombre_del_registro>.azurecr.io   // el .azurecr.io no se sea solo para cuando es azure
+
+   ACR Username: registryxzq2360  
+   ACR Password: +NnaGtSJ5xwQCPPaYmhGAgtX0uGxZw3cFBbSyM8zzi+ACRCJG+XF  
+
+4. Cargar las imagenes en el azure container registry
+      docker tag <nombre_de_la_imagen>:<etiqueta_de_la_imagen> <nombre_del_registro>.azurecr.io/<nombre_de_la_imagen_en_el_registro>:<etiqueta_de_la_imagen>
+      docker push <nombre_del_registro>.azurecr.io/<nombre_de_la_imagen_en_el_registro>:<etiqueta_de_la_imagen>
+
+5. Creamos un grupo de recursos para el cluster
+      az group create --name=$RESOURCE_GROUP --location=$LOCATION
+      az group create --name=gaco-chl02-rg --location=eastus
+
+6. Crear el cluster, según los requerimientos, debemos usar el ARC existente.
+      $CLUSTER_NAME = gaco-aks-chlng-02
+      az aks create --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --node-count 2 --generate-ssh-keys --node-vm-size Standard_B2s --network-plugin azure --attach-acr acrName
+      az aks create --resource-group gaco-chl02-rg --name gaco-aks-chlng-02 --node-count 2 --generate-ssh-keys --node-vm-size Standard_B2s --network-plugin azure --attach-acr registryxzq2360 
+
+7. Nos enlazamos al kubectl para poder acceder al cluster y verificar su creación y demas. (kubectl es para administrar el cluster)
+      az aks get-credentials --name $CLUSTER_NAME --resource-group $RESOURCE_GROUP
+      az aks get-credentials --name gaco-aks-chlng-02 --resource-group gaco-chl02-rg
+
+8. Consultamos los nodos para ver que todo este en orden
+      kubectl get nodes
+
+5. En los criterios de aceptación dice que debemos usar secrets para las credenciales de base de datos, asi que el creamos secretos

@@ -1,0 +1,30 @@
+1.  Construir la imagen (build) del microservicio (POI)
+2.  Bajar la imagen de sql server 2017
+    docker pull mcr.microsoft.com/mssql/server:2017-latest
+3.  Iniciar el container de sql server
+     docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=MyP@ssw0rd" -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2017-latest
+4.  Crear el usuario sqladmin en ssms
+5.  Crear la base de datos mydrivingDB
+6.  Crear una network (el paso 8 ejecuta una imagen que se encuentra en el acr, y para que ese contenedor se comunique con el contenedor de sql server necesita una red)
+     docker network create mired
+7.  Conectar la network con el container de sqlserver
+     docker network connect <nombre_de_la_red> <nombre_del_contenedor>
+8.  Actualizar la base de datos (esta es una imagen que esta en el acr, la imagen carga unos datos en la base de datos sql)
+     docker run --network <networkname> -e SQLFQDN=<servername> -e SQLUSER=<db-user> -e SQLPASS=<password> -e SQLDB=mydrivingDB <your-registry>.azurecr.io/dataload:1.0
+9.  Verificar si el container POI esta agregado a la red que vincula el container de slqserver y el de poi
+10. Revisar que el container poi contesta adecuadamente
+     curl -i -X GET 'http://localhost:8080/api/poi' 
+11. En el punto 4 levantamos el contenedor del sql con el name "sqlserver" en el docker file se ve que POI apunta a "changeme.database.windows.net", renombramos el container de la base de datos
+     docker rename sqlserver changeme.database.windows.net
+     
+
+
+
+
+# CONSIDERACIONES
+1. Revisar que los contenedores esten en la misma red.
+   docker network inspect <nombre_de_la_red>
+2. Si no estan en la red debemos agregar el contenedor que falte
+   docker network connect <nombre_de_la_red> <nombre_del_contenedor>
+3. Puedes probar si un contenedor se ve con otro haciendo ping de uno a otro 
+   docker exec -it container1 ping container2

@@ -1,0 +1,29 @@
+docker ps (para ver los container que se estan ejecutando)
+docker exec <container_name_or_id> printenv   => ver las variables de entorno de un contenedor
+
+docker exec -it container1 ping container2  (comando para hacer ping de un contenedor a otro, los contenedores deben estar en la misma red)
+
+docker rename old_name new_name (comando para renombrar un container en ejecución)
+
+# Agregar grupo de recursos
+az group create --name=$RESOURCE_GROUP --location=$LOCATION
+
+# Agregar cluster
+az aks create \
+    --resource-group $RESOURCE_GROUP \
+    --name $CLUSTER_NAME \
+    --node-count 2 \
+    --enable-addons http_application_routing \
+    --generate-ssh-keys \
+    --node-vm-size Standard_B2s \
+    --network-plugin azure \
+    --windows-admin-username localadmin
+
+# Agregar node pool
+az aks nodepool add \
+    --resource-group $RESOURCE_GROUP \
+    --cluster-name $CLUSTER_NAME \
+    --name uspool \
+    --node-count 2 \
+    --node-vm-size Standard_B2s \
+    --os-type Windows
